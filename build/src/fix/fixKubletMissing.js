@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const question_1 = require("../utils/question");
 const shell = require("shelljs");
+const fs = require("fs");
 const questionGenerator = async (question) => question_1.formattedQuestionGeneratorAsync(question_1.rl)(question);
 const fixHelmFresh = async () => {
     const releaseName = await questionGenerator("What is your helm install releaseName?");
@@ -14,6 +15,27 @@ const fixHelmFresh = async () => {
     }
     shell.exec(cmd);
     console.log("Hurrah! Kubelet metrics should now be coming through!");
+};
+const fixNonHelm = async () => {
+    const cmd = "kubectl get servicemonitor/prometheus-operator-kubelet -o yaml > prometheus-operator-kubelet-servicemonitor.yaml";
+    const proceed = await question_1.setupQuestionsFactory(questionGenerator)(`Cmd: ${cmd} Proceed? [Y/n]`);
+    if (!proceed) {
+        process.exit(0);
+    }
+    shell.exec(cmd);
+    // read the file now, and replace the things that need replacing.
+    let servicemonitor = fs.readFileSync("prometheus-operator-kubelet-servicemonitor.yaml", 'utf8');
+    servicemonitor = servicemonitor.replace(/https/gi, "http");
+    fs.writeFileSync("prometheus-operator-kubelet-servicemonitor.yaml", servicemonitor, "utf8");
+    shell.exec("kubectl delete servicemonitor/prometheus-operator-kubelet");
+    shell.exec("kubectl apply -f prometheus-operator-kubelet-servicemonitor.yaml");
+    const rebootPrometheusCmd = `kubectl delete pods/prometheus-prometheus-operator-prometheus-0 --force --grace-period=0`;
+    const rebootPrometheus = await question_1.setupQuestionsFactory(questionGenerator)(`(optional) Cmd: ${rebootPrometheusCmd} Proceed? [Y/n]`);
+    // we only do this if the user wants to force it.
+    if (rebootPrometheus) {
+        shell.exec(rebootPrometheusCmd);
+    }
+    console.log("Hurrah! Your kubelet metrics should now be coming in!");
 };
 const main = async () => {
     console.log("Starting the fix for kubelet metrics...");
@@ -28,7 +50,7 @@ const main = async () => {
     }
     else if (installMechanism === "non-helm") {
         // patch for non-helm
-        console.log("TODO");
+        await fixNonHelm();
     }
     else {
         console.log("Invalid option provided. You must provide `helm integrated`, `helm fresh`, or `non-helm` as your options.");
