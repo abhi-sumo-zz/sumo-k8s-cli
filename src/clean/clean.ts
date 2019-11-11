@@ -1,5 +1,6 @@
 import { formattedQuestionGeneratorAsync, rl, setupQuestionsFactory } from "../utils/question";
 import { cleanHelmInstall } from "./cleanHelmInstall";
+import { cleanNonHelmInstall } from "./cleanNonHelmInstall";
 
 // file responsible for cleaning up all the objects....
 
@@ -15,7 +16,7 @@ const main = async () => {
         await cleanHelmInstall();
     } else {
         // non-helm install
-        // cleanNonHelmInstall();
+        await cleanNonHelmInstall();
     }
 
     const deleteSumoCollector = await setupQuestionsFactory(questionGenerator)
