@@ -2,3 +2,14 @@ node_modules/**
 index-linux
 index-macos
 index-*.exe
+falco-1.0.7.tgz
+falco-overrides.yaml
+falco.yaml
+fluent-bit-2.7.0.tgz
+fluent-bit-overrides.yaml
+fluent-bit.yaml
+fluentd-sumologic.yaml
+prometheus-operator-6.11.0.tgz
+prometheus-overrides.yaml
+prometheus.yaml
+sumo-setup.sh

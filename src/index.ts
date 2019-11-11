@@ -4,6 +4,7 @@ import { questionGeneratorAsync, setupQuestionsFactory, rl } from './utils/quest
 import { freshInstallHelm } from './install/helm/fresh/freshInstallHelm';
 import { clean } from './clean/clean';
 import { fixKubletMissing } from './fix/fixKubletMissing';
+import { nonHelmInstall } from './install/nonhelm/fresh/nonHelmInstall';
 
 const runFixJobs = async (args: string[]): Promise<void> => {
     if (args.length < 2) {
@@ -16,6 +17,23 @@ const runFixJobs = async (args: string[]): Promise<void> => {
     } else {
         console.log("Invalid job provided!");
         process.exit(0);
+    }
+}
+
+const runInstall = async (args: string[]): Promise<void> => {
+    if (args.length < 2) {
+        console.log("install requires the install type you want to run as well. Options: `helm`, `nonhelm`");
+        process.exit(0);
+    }
+
+    const install = args[1];
+    if (install === "helm") {
+        await freshInstallHelm();
+    } else if (install === "nonhelm") {
+        await nonHelmInstall();
+    } else {
+        console.log("You must provide a valid option. Options: `helm`, `nonhelm`.");
+        process.exit(1);
     }
 }
 
@@ -37,7 +55,7 @@ const main = async () => {
 
     const cliCmd = args[0];
     if (cliCmd === "install") {
-        await freshInstallHelm();
+        await runInstall(args);
     } else if (cliCmd === "clean") {
         // do clean
         await clean();

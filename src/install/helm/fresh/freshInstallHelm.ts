@@ -210,4 +210,4 @@ const freshInstallHelm = async () => {
     }
 }
 
-export { freshInstallHelm, getHelmInstallStdOptions };
+export { freshInstallHelm, getHelmInstallStdOptions, SumoHelmStdOptions };

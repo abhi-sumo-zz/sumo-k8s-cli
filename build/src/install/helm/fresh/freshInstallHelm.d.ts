@@ -9,4 +9,4 @@ interface SumoHelmStdOptions {
 }
 declare const getHelmInstallStdOptions: () => Promise<SumoHelmStdOptions>;
 declare const freshInstallHelm: () => Promise<void>;
-export { freshInstallHelm, getHelmInstallStdOptions };
+export { freshInstallHelm, getHelmInstallStdOptions, SumoHelmStdOptions };

@@ -4,6 +4,7 @@ const question_1 = require("./utils/question");
 const freshInstallHelm_1 = require("./install/helm/fresh/freshInstallHelm");
 const clean_1 = require("./clean/clean");
 const fixKubletMissing_1 = require("./fix/fixKubletMissing");
+const nonHelmInstall_1 = require("./install/nonhelm/fresh/nonHelmInstall");
 const runFixJobs = async (args) => {
     if (args.length < 2) {
         console.log("Fix requires the job you want to run as well.");
@@ -16,6 +17,23 @@ const runFixJobs = async (args) => {
     else {
         console.log("Invalid job provided!");
         process.exit(0);
+    }
+};
+const runInstall = async (args) => {
+    if (args.length < 2) {
+        console.log("install requires the install type you want to run as well. Options: `helm`, `nonhelm`");
+        process.exit(0);
+    }
+    const install = args[1];
+    if (install === "helm") {
+        await freshInstallHelm_1.freshInstallHelm();
+    }
+    else if (install === "nonhelm") {
+        await nonHelmInstall_1.nonHelmInstall();
+    }
+    else {
+        console.log("You must provide a valid option. Options: `helm`, `nonhelm`.");
+        process.exit(1);
     }
 };
 /**
@@ -34,7 +52,7 @@ const main = async () => {
     }
     const cliCmd = args[0];
     if (cliCmd === "install") {
-        await freshInstallHelm_1.freshInstallHelm();
+        await runInstall(args);
     }
     else if (cliCmd === "clean") {
         // do clean
